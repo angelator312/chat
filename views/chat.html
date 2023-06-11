@@ -38,6 +38,7 @@
     let c = document.getElementsByClassName("content");
     let m = document.getElementsByClassName("member");
     let ms=[],cs=[];
+    if(document.getElementById('check').checked){
     try{
     for (let i = 0; i < m.length; i++) {
       ms.push(CryptoJS.AES.decrypt(m[i].dataset.encrypted, p).toString(
@@ -56,6 +57,14 @@
       m[i].innerHTML = ms[i];
       c[i].innerHTML = cs[i];
     }
+    }else{
+      document.getElementById('check').checked=false;
+      for (let i = 0; i < m.length; i++) {
+      m[i].innerHTML = "encrypted";
+      c[i].innerHTML = "encrypted";
+    }
+    }
+    
     console.log("decrypted");
   }
   document.body.onload = decr;
@@ -96,7 +105,7 @@
         type="text"
       />
       <div class="input-group-text ">
-        <input class="form-check-input mt-0" id="check" onclick="decr()" type="checkbox" value="" aria-label="Checkbox for following text input">
+        <input class="form-check-input mt-0" id="check" onclick="decr()" type="checkbox" value="" aria-label="Checkbox for following text input" checked>
         <label class="form-check-label" for="check">Decrypt</label>
       </div>
       </div>
