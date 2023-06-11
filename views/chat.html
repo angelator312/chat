@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<%- include('_header.html') %>
+<script type="text/javascript">
+  function onS() {
+    let m = document.getElementById("f-member");
+    sessionStorage.setItem("member", m.value);
+    let p = document.getElementById("f-pwd");
+    if (!p.value) {
+      p = sessionStorage.getItem("pwd");
+      if (!p) {
+        alert("Please enter password");
+        return false;
+      }
+    } else {
+      sessionStorage.setItem("pwd", p.value);
+      p = p.value;
+    }
+    let c = document.getElementById("f-content");
+    m.value = CryptoJS.AES.encrypt(m.value, p);
+    c.value = CryptoJS.AES.encrypt(c.value, p);
+    console.log(m.value, c.value, p);
+    return false;
+  }
+  function decr() {
+    let p = document.getElementById("f-pwd");
+    if (!p.value) {
+      p.value = sessionStorage.getItem("pwd");
+      if (!p.value) {
+        alert("Please enter password");
+        return false;
+      }
+    }
+    let mem = sessionStorage.getItem("member");
+    if (mem) {
+      document.getElementById("f-member").value = mem;
+    }
+    p = p.value;
+    let c = document.getElementsByClassName("content");
+    let m = document.getElementsByClassName("member");
+    let ms=[],cs=[];
+    try{
+    for (let i = 0; i < m.length; i++) {
+      ms.push(CryptoJS.AES.decrypt(m[i].dataset.encrypted, p).toString(
+        CryptoJS.enc.Utf8
+      ));
+      cs.push(CryptoJS.AES.decrypt(c[i].dataset.encrypted, p).toString(
+        CryptoJS.enc.Utf8
+      ));
+    }
+    }catch(e){
+      alert("Decryption failed");
+      return false;
+    }
+    sessionStorage.setItem("pwd", p);
+    for (let i = 0; i < m.length; i++) {
+      m[i].innerHTML = ms[i];
+      c[i].innerHTML = cs[i];
+    }
+    console.log("decrypted");
+  }
+  document.body.onload = decr;
+</script>
+
+<div class="card">
+  <div class="card-body">
+    <h1 class="card-title"><%= chat.name %></h1>
+    <table class="table table-primary table-sm">
+      <thead>
+    <tr>
+      <th scope="col-2">Member</th>
+      <th scope="col">:</th>
+      <th scope="col">Message</th>
+    </tr>
+  </thead>
+  <tbody>  
+    <tr>
+   <td scope="col-2">System-Owner-Chats</td>
+    <td scope="col">:</td>
+    <td scope="col">Hello Members!</td>
+    </tr>
+    <% for(let i of chat.msgs){ %>
+    <tr>
+      <td scope="col-2" data-encrypted="<%= i.member %>" class="member">encrypted</td>
+      <td scope="col">:</td>
+      <td scope="col" data-encrypted="<%= i.content %>" class="content">encrypted</td>
+    </tr>
+    <% } %>
+  </tbody>
+    </table>
+    <div class="input-group mb-3">
+      <input
+        class="form-control"
+        id="f-pwd"
+        placeholder="Password,type it here"
+        name="pwd"
+        type="text"
+      />
+      <div class="input-group-text ">
+        <input class="form-check-input mt-0" id="check" onclick="decr()" type="checkbox" value="" aria-label="Checkbox for following text input">
+        <label class="form-check-label" for="check">Decrypt</label>
+      </div>
+      </div>
+      <form onsubmit="onS()" action=<%="/newMsg/" +chat._id %>
+        >
+        <input
+          class="form-control mb-3"
+          id="f-member"
+          placeholder="Member name,type it here"
+          name="member"
+          type="text"
+          required
+        />
+        <input
+          class="form-control"
+          id="f-content"
+          placeholder="Message,type it here"
+          name="msg"
+          type="text"
+          required
+        /><br />
+
+        <input class="btn btn-primary" type="submit" /><br />
+      </form>
+    </div>
+  </div>
+  <%- include('_footer.html') %>
+</div>
