@@ -56,7 +56,7 @@ app.get("/newMsg/:chatId", async function (req, res) {
     //chat.msgs.push({content:AES.encrypt(k,req.query.msg),member:AES.encrypt(k,req.query.member)});
     chat.msgs.push({content:req.query.msg,member:req.query.member});
     await chats.addkey(req.params.chatId,chat);
-    res.redirect(`// ${location}/chats/${chat._id}`);
+    res.redirect(`//${location}/chats/${chat._id}`);
   } else {
     res.writeHead(404, { "Content-Type": `text/html; charset=utf-8` });
     res.write("<h1>404</h1>");
