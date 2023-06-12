@@ -9,7 +9,7 @@ const app = express();
 const templatePath = path.join(__dirname, "views");
 const chats = new Mongostore("chats");
 const port = process.env.PORT ?? 8080;
-
+const location = port ==8080 ? "localhost:8080" : "chat.angelator312.top";
 // свързваме монгото-акаунти
 chats.conect(process.env.MONGO_URL);
 // конфигурации
@@ -33,7 +33,7 @@ app.get("/newChat", async function (req, res) {
     name: req.query.name,
     msgs: [{ content: "Hello,members!", member: "Creator-Owner-Chats-System" }],
   });
-  res.redirect(`http://localhost:${port}/chats/${newChat}`);
+  res.redirect(`http://${location}/chats/${newChat}`);
 });
 app.get("/chats/:chatId?", async function (req, res) {
   const chat = await chats.getkey(req.params.chatId);
@@ -56,7 +56,7 @@ app.get("/newMsg/:chatId", async function (req, res) {
     //chat.msgs.push({content:AES.encrypt(k,req.query.msg),member:AES.encrypt(k,req.query.member)});
     chat.msgs.push({content:req.query.msg,member:req.query.member});
     await chats.addkey(req.params.chatId,chat);
-    res.redirect("//localhost:8080/chats/"+chat._id);
+    res.redirect(`// ${location}/chats/${chat._id}`);
   } else {
     res.writeHead(404, { "Content-Type": `text/html; charset=utf-8` });
     res.write("<h1>404</h1>");
