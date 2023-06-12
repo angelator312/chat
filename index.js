@@ -31,7 +31,7 @@ app.get("/newChat", async function (req, res) {
   const newChat = uuid.v4();
   await chats.addkey(newChat, {
     name: req.query.name,
-    msgs: [{ content: "Hello,members!", member: "Creator-Owner-Chats-System" }],
+    msgs: [],
   });
   res.redirect(`http://${location}/chats/${newChat}`);
 });
