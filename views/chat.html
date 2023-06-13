@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%- include('_header.html') %>
 <script type="text/javascript">
+  // fuctions
   function onS() {
     let m = document.getElementById("f-member");
     sessionStorage.setItem("member", m.value);
@@ -21,6 +22,8 @@
     console.log(m.value, c.value, p);
     return false;
   }
+
+  // function 
   function decr() {
     let p = document.getElementById("f-pwd");
     if (!p.value) {
@@ -68,7 +71,29 @@
     
     console.log("decrypted");
   }
-  document.body.onload = decr;
+  async function pollMsgs(){
+    const r=await fetch(window.location.pathname+"/msgs");
+    const chat=await r.json();
+    const tbody = document.getElementById("tbody");
+    let s=`<tr>
+   <td scope="col-2">System-Owner-Chats</td>
+    <td scope="col">:</td>
+    <td scope="col">Hello Members!</td>
+    </tr>`;
+    for (let i of chat.msgs) {
+      s+=`<tr>
+      <td scope="col-2" data-encrypted="${ i.member }" class="member">encrypted</td>
+      <td scope="col">:</td>
+      <td scope="col" data-encrypted="${i.content}" class="content">encrypted</td>
+    </tr>`
+    }tbody.innerHTML=s;
+    decr();
+    setTimeout(pollMsgs, 5000);
+  }
+
+  //document 
+  document.body.onload = ()=>pollMsgs();
+
 </script>
 
 <div class="card">
@@ -82,7 +107,7 @@
       <th scope="col">Message</th>
     </tr>
   </thead>
-  <tbody>  
+  <tbody id="tbody">  
     <tr>
    <td scope="col-2">System-Owner-Chats</td>
     <td scope="col">:</td>

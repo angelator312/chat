@@ -35,7 +35,7 @@ app.get("/newChat", async function (req, res) {
   });
   res.redirect(`http://${location}/chats/${newChat}`);
 });
-app.get("/chats/:chatId?", async function (req, res) {
+app.get("/chats/:chatId", async function (req, res) {
   const chat = await chats.getkey(req.params.chatId);
   if (chat) {
     console.log(chat);
@@ -46,6 +46,18 @@ app.get("/chats/:chatId?", async function (req, res) {
     res.writeHead(404, { "Content-Type": `text/html; charset=utf-8` });
     res.write("<h1>404</h1>");
     res.write("Няма такъв чат, no such Chat");
+    res.end();
+  }
+});
+app.get("/chats/:chatId/msgs", async function (req, res) {
+  const chat = await chats.getkey(req.params.chatId);
+  if (chat) {
+    res.writeHead(200, { "Content-Type": `application/json`});
+    res.write(JSON.stringify(chat));
+    res.end();
+  } else {
+    res.writeHead(404, { "Content-Type": `application/json`});
+    res.write(' { "error":"Няма такъв чат, no such Chat"}');
     res.end();
   }
 });
