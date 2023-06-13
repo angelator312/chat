@@ -9,9 +9,10 @@
     if (!p.value) {
       p = sessionStorage.getItem("pwd");
       if (!p) {
-        alert("Please enter password");
+        sH(true);
         return false;
       }
+      sH(false);
     } else {
       sessionStorage.setItem("pwd", p.value);
       p = p.value;
@@ -23,15 +24,26 @@
     return false;
   }
 
+  //function 
+  function sH(b){
+    if(b)
+      document.getElementById("d-n").style.display = 'block';
+    else{
+      // hide the lorem ipsum text
+      document.getElementById("d-n").style.display = 'none';
+    }
+  }
+
   // function 
   function decr() {
     let p = document.getElementById("f-pwd");
     if (!p.value) {
       p.value = sessionStorage.getItem("pwd");
       if (!p.value) {
-        alert("Please enter password");
+        sH(true);
         return false;
       }
+      sH(false);
     }
     let mem = sessionStorage.getItem("member");
     if (mem) {
@@ -53,9 +65,10 @@
     }
     }catch(e){
       document.getElementById('check').checked=false;
-      alert("Decryption failed");
+      sH(true);
       return false;
     }
+    sH(false);
     sessionStorage.setItem("pwd", p);
     for (let i = 0; i < m.length; i++) {
       m[i].innerHTML = ms[i];
@@ -99,6 +112,9 @@
 <div class="card">
   <div class="card-body">
     <h1 class="card-title"><%= chat.name %></h1>
+    <div class="alert alert-danger" role="alert" id="d-n">
+      Please enter password!
+    </div>
     <table class="table table-primary table-sm">
       <thead>
     <tr>
