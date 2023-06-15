@@ -20,22 +20,31 @@ class Mongostore {
         // Взимаме си колекцията с която ще работим
         this.collection = database.collection(this.kolekcia);
     }
-    async addkey(key, value) {
-        await this.collection.replaceOne({ _id: key }, {
-            _id: key,
-            ...value
-        }, { upsert: true });
+    async addMsg(chat,mem,msg,enc,extra={}) {
+        await this.collection.insertOne({
+            chat,
+            time:new Date(),
+            msg,mem,enc,
+            ...extra
+        });
     }
-    async deletekey(key) {
-        await this.collection.deleteOne({ _id: key });
+    // async deletekey(key) {
+    //     await this.collection.deleteOne({ _id: key });
 
-    }
-    async getkey(key) {
-        const data = await this.collection.findOne({ _id: key });
-        if (!data) {
+    // }
+    // async getkey(key) {
+    //     const data = await this.collection.findOne({ _id: key });
+    //     if (!data) {
+    //         return null;
+    //     }
+    //     // delete data._id;
+    //     return data;
+    // }
+    async getMsgs(chat_id){
+        const data =  await this.collection.find({ chat:chat_id },{sort:{time:'ascending'}}).toArray();
+        if(data.length==0){
             return null;
         }
-        // delete data._id;
         return data;
     }
 }

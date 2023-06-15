@@ -29,14 +29,11 @@ app.get("/", async function (req, res) {
 });
 app.get("/newChat", async function (req, res) {
   const newChat = uuid.v4();
-  await chats.addkey(newChat, {
-    name: req.query.name,
-    msgs: [],
-  });
+  await chats.addMsg(newChat, "System-Owner-Chats","Hello members!",false,{chat_name:req.query.name});
   res.redirect(`http://${location}/chats/${newChat}`);
 });
 app.get("/chats/:chatId", async function (req, res) {
-  const chat = await chats.getkey(req.params.chatId);
+  const chat = await chats.getMsgs(req.params.chatId);
   if (chat) {
     console.log(chat);
     res.render("chat", {
@@ -50,7 +47,7 @@ app.get("/chats/:chatId", async function (req, res) {
   }
 });
 app.get("/chats/:chatId/msgs", async function (req, res) {
-  const chat = await chats.getkey(req.params.chatId);
+  const chat = await chats.getMsgs(req.params.chatId);
   if (chat) {
     res.writeHead(200, { "Content-Type": `application/json`});
     res.write(JSON.stringify(chat));
@@ -62,13 +59,13 @@ app.get("/chats/:chatId/msgs", async function (req, res) {
   }
 });
 app.get("/newMsg/:chatId", async function (req, res) {
-  const chat = await chats.getkey(req.params.chatId);
+  const id=req.params.chatId;
+  const chat = await chats.getMsgs(id);
   if (chat) {
     // const k=AES.generateKey(req.query.pwd);
     //chat.msgs.push({content:AES.encrypt(k,req.query.msg),member:AES.encrypt(k,req.query.member)});
-    chat.msgs.push({content:req.query.msg,member:req.query.member});
-    await chats.addkey(req.params.chatId,chat);
-    res.redirect(`//${location}/chats/${chat._id}`);
+    await chats.addMsg(id,req.query.member,req.query.msg,true);
+    res.redirect(`//${location}/chats/${chat[0].chat}`);
   } else {
     res.writeHead(404, { "Content-Type": `text/html; charset=utf-8` });
     res.write("<h1>404</h1>");

@@ -56,12 +56,17 @@
     if(document.getElementById('check').checked){
     try{
     for (let i = 0; i < m.length; i++) {
+      if(m[i].dataset.enc=="true"){
       ms.push(CryptoJS.AES.decrypt(m[i].dataset.encrypted, p).toString(
         CryptoJS.enc.Utf8
       ));
       cs.push(CryptoJS.AES.decrypt(c[i].dataset.encrypted, p).toString(
         CryptoJS.enc.Utf8
       ));
+      }else{
+        ms.push(m[i].dataset.encrypted);
+        cs.push(c[i].dataset.encrypted);
+      }
     }
     }catch(e){
       document.getElementById('check').checked=false;
@@ -88,20 +93,16 @@
     const r=await fetch(window.location.pathname+"/msgs");
     const chat=await r.json();
     const tbody = document.getElementById("tbody");
-    let s=`<tr>
-   <td scope="col-2">System-Owner-Chats</td>
-    <td scope="col">:</td>
-    <td scope="col">Hello Members!</td>
-    </tr>`;
-    for (let i of chat.msgs) {
+    let s=``;
+    for (let i of chat) {
       s+=`<tr>
-      <td scope="col-2" data-encrypted="${ i.member }" class="member">encrypted</td>
+      <td scope="col-2" data-enc="${i.enc}" data-encrypted="${ i.mem }" class="member">encrypted</td>
       <td scope="col">:</td>
-      <td scope="col" data-encrypted="${i.content}" class="content">encrypted</td>
+      <td scope="col" data-encrypted="${i.msg}" class="content">encrypted</td>
     </tr>`
     }tbody.innerHTML=s;
     decr();
-    setTimeout(pollMsgs, 5000);
+    // setTimeout(pollMsgs, 5000);
   }
 
   //document 
@@ -111,7 +112,7 @@
 
 <div class="card">
   <div class="card-body">
-    <h1 class="card-title"><%= chat.name %></h1>
+    <h1 class="card-title"><%= chat[0].chat_name%></h1>
     <div class="alert alert-danger" role="alert" id="d-n">
       Please enter password!
     </div>
@@ -124,16 +125,11 @@
     </tr>
   </thead>
   <tbody id="tbody">  
+    <% for(let i of chat){ %>
     <tr>
-   <td scope="col-2">System-Owner-Chats</td>
-    <td scope="col">:</td>
-    <td scope="col">Hello Members!</td>
-    </tr>
-    <% for(let i of chat.msgs){ %>
-    <tr>
-      <td scope="col-2" data-encrypted="<%= i.member %>" class="member">encrypted</td>
+      <td scope="col-2" data-enc="<%= i.enc %>" data-encrypted="<%= i.mem %>" class="member">encrypted</td>
       <td scope="col">:</td>
-      <td scope="col" data-encrypted="<%= i.content %>" class="content">encrypted</td>
+      <td scope="col"  data-encrypted="<%= i.msg %>" class="content">encrypted</td>
     </tr>
     <% } %>
   </tbody>
@@ -151,7 +147,7 @@
         <label class="form-check-label" for="check">Decrypt</label>
       </div>
       </div>
-      <form onsubmit="onS()" action=<%="/newMsg/" +chat._id %>
+      <form onsubmit="onS()" action=<%="/newMsg/" +chat[0].chat %>
         >
         <input
           class="form-control mb-3"
