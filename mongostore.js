@@ -21,12 +21,15 @@ class Mongostore {
         this.collection = database.collection(this.kolekcia);
     }
     async addMsg(chat,mem,msg,enc,extra={}) {
-        await this.collection.insertOne({
+        const v={
             chat,
             time:new Date(),
             msg,mem,enc,
             ...extra
-        });
+        };
+        const i= await this.collection.insertOne(v);
+        v._id=i.insertedId;
+        return v;
     }
     // async deletekey(key) {
     //     await this.collection.deleteOne({ _id: key });
