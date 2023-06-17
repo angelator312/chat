@@ -2,7 +2,7 @@
 <%- include('_header.html') %>
 <script type="text/javascript">
   let pwd;
-  function updatePwd(p){
+  function updatePwd(p) {
     if (!p) {
       p = sessionStorage.getItem("pwd");
       if (!p) {
@@ -11,18 +11,16 @@
     } else {
       sessionStorage.setItem("pwd", p);
     }
-    pwd=p;
-    document.getElementById("f-pwd").value=pwd;
+    pwd = p;
+    document.getElementById("f-pwd").value = pwd;
     return true;
   }
-  function decryptString(str){
+  function decryptString(str) {
     let p = document.getElementById("f-pwd");
     sH(!updatePwd(p.value));
-    try{
-    return CryptoJS.AES.decrypt(str, pwd).toString(
-        CryptoJS.enc.Utf8
-      );
-    }catch(e){
+    try {
+      return CryptoJS.AES.decrypt(str, pwd).toString(CryptoJS.enc.Utf8);
+    } catch (e) {
       return null;
     }
   }
@@ -31,7 +29,7 @@
     let m = document.getElementById("f-member");
     sessionStorage.setItem("member", m.value);
     let p = document.getElementById("f-pwd");
-   updatePwd(p.value);
+    updatePwd(p.value);
     let c = document.getElementById("f-content");
     m.value = CryptoJS.AES.encrypt(m.value, pwd);
     c.value = CryptoJS.AES.encrypt(c.value, pwd);
@@ -39,19 +37,18 @@
     return false;
   }
 
-  //function 
-  function sH(b){
-    if(b){
+  //function
+  function sH(b) {
+    if (b) {
       sessionStorage.removeItem("pwd");
-      document.getElementById("d-n").style.display = 'block';
-    }
-    else{
+      document.getElementById("d-n").style.display = "block";
+    } else {
       // hide the lorem ipsum text
-      document.getElementById("d-n").style.display = 'none';
+      document.getElementById("d-n").style.display = "none";
     }
   }
 
-  // function 
+  // function
   function decr() {
     let p = document.getElementById("f-pwd");
     sH(!updatePwd(p.value));
@@ -61,40 +58,45 @@
     }
     let c = document.getElementsByClassName("content");
     let m = document.getElementsByClassName("member");
-    let ms=[],cs=[];
-    if(document.getElementById('check').checked){
-    try{
-    for (let i = 0; i < m.length; i++) {
-      if(m[i].dataset.enc=="true"){
-      ms.push(CryptoJS.AES.decrypt(m[i].dataset.encrypted, pwd).toString(
-        CryptoJS.enc.Utf8
-      ));
-      cs.push(CryptoJS.AES.decrypt(c[i].dataset.encrypted, pwd).toString(
-        CryptoJS.enc.Utf8
-      ));
-      }else{
-        ms.push(m[i].dataset.encrypted);
-        cs.push(c[i].dataset.encrypted);
+    let ms = [],
+      cs = [];
+    if (document.getElementById("check").checked) {
+      try {
+        for (let i = 0; i < m.length; i++) {
+          if (m[i].dataset.enc == "true") {
+            ms.push(
+              CryptoJS.AES.decrypt(m[i].dataset.encrypted, pwd).toString(
+                CryptoJS.enc.Utf8
+              )
+            );
+            cs.push(
+              CryptoJS.AES.decrypt(c[i].dataset.encrypted, pwd).toString(
+                CryptoJS.enc.Utf8
+              )
+            );
+          } else {
+            ms.push(m[i].dataset.encrypted);
+            cs.push(c[i].dataset.encrypted);
+          }
+        }
+      } catch (e) {
+        document.getElementById("check").checked = false;
+        sH(true);
+        return false;
+      }
+      sH(false);
+      for (let i = 0; i < m.length; i++) {
+        m[i].innerHTML = ms[i];
+        c[i].innerHTML = cs[i];
+      }
+    } else {
+      document.getElementById("check").checked = false;
+      for (let i = 0; i < m.length; i++) {
+        m[i].innerHTML = "encrypted";
+        c[i].innerHTML = "encrypted";
       }
     }
-    }catch(e){
-      document.getElementById('check').checked=false;
-      sH(true);
-      return false;
-    }
-    sH(false);
-    for (let i = 0; i < m.length; i++) {
-      m[i].innerHTML = ms[i];
-      c[i].innerHTML = cs[i];
-    }
-    }else{
-      document.getElementById('check').checked=false;
-      for (let i = 0; i < m.length; i++) {
-      m[i].innerHTML = "encrypted";
-      c[i].innerHTML = "encrypted";
-    }
-    }
-    
+
     console.log("decrypted");
   }
   // async function pollMsgs(){
@@ -113,64 +115,80 @@
   //   // setTimeout(pollMsgs, 5000);
   // }
 
-  //document 
-
+  //document
 </script>
 <script src="/socket.io/socket.io.js"></script>
 
-
-
 <div class="card">
   <div class="card-body">
-    <h1 class="card-title"><%= chat[0].chat_name%></h1>
-    <div class="alert alert-danger" role="alert" id="d-n">
-      Please enter password!
-      or
-      Decrypt failed!
+    <div class="row">
+      <div class="col-6">
+        <h1 class="card-title"><%= chat[0].chat_name%></h1>
+      </div>
+      <div class="col-6">
+        <div class="input-group">
+          <input
+            class="form-control"
+            id="f-pwd"
+            placeholder="Password,type it here"
+            name="pwd"
+            type="text"
+          />
+          <div class="input-group-text">
+            <input
+              class="form-check-input mt-0"
+              id="check"
+              onclick="decr()"
+              type="checkbox"
+              value=""
+              aria-label="Checkbox for following text input"
+              checked
+            />
+            <label class="form-check-label" for="check">Decrypt</label>
+          </div>
+        </div>
+      </div>
     </div>
-    <table class="table table-primary table-sm">
-      <thead>
-    <tr>
-      <th scope="col-2">Member</th>
-      <th scope="col">:</th>
-      <th scope="col">Message</th>
-    </tr>
-  </thead>
-  <tbody id="tbody">  
-  </tbody>
-    </table>
-    <div class="input-group mb-3">
-      <input
-        class="form-control"
-        id="f-pwd"
-        placeholder="Password,type it here"
-        name="pwd"
-        type="text"
-      />
-      <div class="input-group-text ">
-        <input class="form-check-input mt-0" id="check" onclick="decr()" type="checkbox" value="" aria-label="Checkbox for following text input" checked>
-        <label class="form-check-label" for="check">Decrypt</label>
-      </div>
-      </div>
-      <form id="form">
-        <input
-          class="form-control mb-3"
-          id="f-member"
-          placeholder="Member name,type it here"
-          name="member"
-          type="text"
-          required
-        />
-        <input
-          class="form-control"
-          id="f-content"
-          placeholder="Message,type it here"
-          name="msg"
-          type="text"
-          required
-        /><br />
-
-        <input class="btn btn-primary" type="submit" /><br />
+    <div class="alert alert-danger" role="alert" id="d-n">
+      Please enter password! or Decrypt failed!
+    </div>
+    <div class="table-responsive h-100">
+      <table class="table table-primary table-sm table-bordered table-striped">
+        <thead>
+          <tr>
+            <th scope="col-2">Member</th>
+            <th scope="col">Message</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="spacer"></div>
+    <div id="send">
+      <form class="w-100 row row-cols-lg-auto g-3 align-items-center" id="form">
+        <div class="col-3">
+          <input
+            class="form-control"
+            id="f-member"
+            placeholder="Member name,type it here"
+            name="member"
+            type="text"
+            required
+          />
+        </div>
+        <div class="col-9">
+          <div class="input-group">
+            <input
+              class="form-control"
+              id="f-content"
+              placeholder="Message,type it here"
+              name="msg"
+              type="text"
+              required
+            />
+            <input class="btn btn-primary" type="submit" />
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -180,7 +198,7 @@
   function initSockets() {
     let socket = io({
       extraHeaders: {
-        "chat-id": window.location.pathname.split('/').at(-1),
+        "chat-id": window.location.pathname.split("/").at(-1),
       },
     });
     let messages = document.getElementById("tbody");
@@ -191,55 +209,52 @@
       sessionStorage.setItem("member", m.value);
       let p = document.getElementById("f-pwd");
       let c = document.getElementById("f-content");
-      if(!updatePwd(false)){
+      if (!updatePwd(false)) {
         sH(true);
         m.value = "";
-        c.value="";
+        c.value = "";
         return;
-      }      
-      p=pwd;
+      }
+      p = pwd;
 
       let mem = CryptoJS.AES.encrypt(m.value, p).toString();
       let msg = CryptoJS.AES.encrypt(c.value, p).toString();
-      socket.emit("chat message", {mem,msg,enc:true});
+      socket.emit("chat message", { mem, msg, enc: true });
       c.value = "";
     });
     socket.on("chat message", function (msg) {
-      if(document.getElementById("chat-"+msg._id)){
+      if (document.getElementById("chat-" + msg._id)) {
         return;
       }
       let tr = document.createElement("tr");
       let td = document.createElement("td");
-      let td2 = document.createElement("td");
       let td3 = document.createElement("td");
-      td.dataset.enc=msg.enc;
-      td.dataset.encrypted=msg.mem;
-      td2.textContent=":";
-      td3.dataset.encrypted=msg.msg;
-      if(!msg.enc){
-        td.textContent=msg.mem;
-        td3.textContent=msg.msg;
-      }else {
-        let m=decryptString(msg.mem);
-        if(m){
-          td.textContent=m;
-          let c=decryptString(msg.msg);
-          td3.textContent=c;
+      td.dataset.enc = msg.enc;
+      td.dataset.encrypted = msg.mem;
+      td3.dataset.encrypted = msg.msg;
+      if (!msg.enc) {
+        td.textContent = msg.mem;
+        td3.textContent = msg.msg;
+      } else {
+        let m = decryptString(msg.mem);
+        if (m) {
+          td.textContent = m;
+          let c = decryptString(msg.msg);
+          td3.textContent = c;
         }
       }
+      td.style.width = "30%";
+      td3.style.width = "70%";
       td.classList.add("member");
       td3.classList.add("content");
-      tr.id="chat-"+msg._id;
+      tr.id = "chat-" + msg._id;
       tr.appendChild(td);
-      tr.appendChild(td2);
       tr.appendChild(td3);
       messages.appendChild(tr);
-      // window.scrollTo(0, document.body.scrollHeight);
+      window.scrollTo(0, document.body.scrollHeight);
     });
   }
-  document.body.onload = ()=>initSockets();
-
+  document.body.onload = () => initSockets();
 </script>
-
 
 <%- include('_footer.html') %>

@@ -1,14 +1,22 @@
 <%- include('_header.html') %>
-<h1>Chat</h1>
-<form action="/newChat">
-  <div class="form-group">
-    <input name="name" class="form-control" placeholder="Enter chat name" required /><br/>
-    <input
-      type="submit"
-      class="btn btn-primary"
-      value="Click here for new chat in chat space!"
-    />
+<div class="card mt-5 mx-5" id="index">
+  <div class="card-body">
+    <h1>This is AES encrypted chat!</h1>
+    <form action="/newChat">
+      <div class="form-group">
+        <input
+          name="name"
+          class="form-control"
+          placeholder="Enter chat name"
+          required
+        /><br />
+        <input
+          type="submit"
+          class="btn btn-primary"
+          value="Click here for new chat in chat space!"
+        />
+      </div>
+    </form>
   </div>
-</form>
-<h2>This is RSA cripting chat!</h2>
+</div>
 <%- include('_footer.html') %>
